@@ -171,10 +171,88 @@
   }
 
   /* ------------------------------------------------------------------------
+   * 7. Hero title letter reveal
+   * ------------------------------------------------------------------------ */
+  function initTitleReveal() {
+    const title = document.getElementById('hero-title');
+    if (!title) return;
+    let i = 0;
+    const wrap = (node, accent) => {
+      const frag = document.createDocumentFragment();
+      for (const ch of node.textContent.trim()) {
+        const span = document.createElement('span');
+        span.className = 'char' + (accent ? ' crimson-accent' : '');
+        span.style.setProperty('--i', i++);
+        span.setAttribute('aria-hidden', 'true');
+        span.textContent = ch;
+        frag.appendChild(span);
+      }
+      return frag;
+    };
+    const nodes = Array.from(title.childNodes);
+    title.textContent = '';
+    nodes.forEach((n) => {
+      if (!n.textContent.trim()) return;
+      const accent = n.nodeType === 1 && n.classList.contains('crimson-accent');
+      title.appendChild(wrap(n, accent));
+    });
+    requestAnimationFrame(() => title.classList.add('is-ready'));
+  }
+
+  /* ------------------------------------------------------------------------
+   * 8. Scroll progress hairline + parallax rings
+   * ------------------------------------------------------------------------ */
+  function initScrollEffects() {
+    const bar = document.getElementById('scroll-progress');
+    const rings = document.querySelector('.void-rings');
+    let ticking = false;
+    const update = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const y = window.scrollY;
+      if (bar) bar.style.transform = `scaleX(${max > 0 ? y / max : 0})`;
+      if (rings && !prefersReducedMotion) {
+        rings.style.setProperty('--py', `${y * 0.12}px`);
+      }
+      ticking = false;
+    };
+    window.addEventListener('scroll', () => {
+      if (!ticking) { requestAnimationFrame(update); ticking = true; }
+    }, { passive: true });
+    update();
+  }
+
+  /* ------------------------------------------------------------------------
+   * 9. Minimal cursor ring
+   * ------------------------------------------------------------------------ */
+  function initCursorRing() {
+    const ring = document.getElementById('cursor-ring');
+    if (!ring || prefersReducedMotion) return;
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+    let tx = 0, ty = 0, x = 0, y = 0, shown = false;
+    window.addEventListener('mousemove', (e) => {
+      tx = e.clientX; ty = e.clientY;
+      if (!shown) { shown = true; ring.style.opacity = '1'; }
+    }, { passive: true });
+    document.addEventListener('mouseleave', () => { ring.style.opacity = '0'; shown = false; });
+    const hoverSel = 'a, button, .list-entry';
+    document.addEventListener('mouseover', (e) => {
+      ring.classList.toggle('is-active', !!e.target.closest(hoverSel));
+    });
+    (function loop() {
+      x += (tx - x) * 0.18; y += (ty - y) * 0.18;
+      ring.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      requestAnimationFrame(loop);
+    })();
+  }
+
+  /* ------------------------------------------------------------------------
    * Initialization
    * ------------------------------------------------------------------------ */
   document.addEventListener('DOMContentLoaded', () => {
+    initTitleReveal();
     initScrollReveal();
+    initScrollEffects();
+    initCursorRing();
     initMouseGlow();
     initUtcClock();
     initBackToTop();

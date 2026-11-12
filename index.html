@@ -65,7 +65,16 @@
   <div class="ambient-vignette" aria-hidden="true"></div>
   <div class="ambient-glow" aria-hidden="true"></div>
   <div class="mouse-glow" id="mouse-glow" aria-hidden="true"></div>
+  <div class="grid-backdrop" aria-hidden="true"></div>
+  <div class="orb orb-a" aria-hidden="true"></div>
+  <div class="orb orb-b" aria-hidden="true"></div>
   <div class="grain-overlay" aria-hidden="true"></div>
+  <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
+  <div class="cursor-ring" id="cursor-ring" aria-hidden="true"></div>
+
+  <!-- Side rails -->
+  <div class="side-rail rail-left" aria-hidden="true"><span>AV / 00</span></div>
+  <div class="side-rail rail-right" aria-hidden="true"><span>BEYOND THE INTERFACE</span></div>
 
   <!-- Minimal Persistent Navigation -->
   <header class="site-header" role="banner">
@@ -98,6 +107,14 @@
     
     <!-- Hero Section -->
     <section id="hero" class="hero-section" aria-label="Introduction">
+      <svg class="void-rings" viewBox="0 0 800 800" aria-hidden="true" focusable="false">
+        <circle cx="400" cy="400" r="120" />
+        <circle cx="400" cy="400" r="200" />
+        <circle cx="400" cy="400" r="280" />
+        <circle cx="400" cy="400" r="360" />
+        <circle class="ring-accent" cx="400" cy="400" r="200" pathLength="100" />
+        <circle class="ring-dot" cx="400" cy="40" r="3" />
+      </svg>
       <div class="container hero-container">
         
         <div class="hero-overline fade-in" data-delay="100">
@@ -105,7 +122,7 @@
           <span>DIGITAL IDENTITY / EST. IN THE UNKNOWN</span>
         </div>
 
-        <h1 class="hero-title fade-in" data-delay="200">
+        <h1 class="hero-title" id="hero-title" aria-label="AldersonVoid.">
           AldersonVoid<span class="crimson-accent">.</span>
         </h1>
 
@@ -292,6 +309,7 @@
 
   <!-- Footer Section -->
   <footer class="site-footer" role="contentinfo">
+    <div class="footer-wordmark" aria-hidden="true">AldersonVoid</div>
     <div class="container footer-container">
       
       <div class="footer-left">
