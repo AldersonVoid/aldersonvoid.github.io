@@ -1,6 +1,6 @@
 /**
  * ALDERSONVOID — PREMIUM PERSONAL IDENTITY
- * Interaction & Motion Controller
+ * Interaction & Motion Controller (Zero Forced Reflow)
  */
 
 (function () {
@@ -10,98 +10,27 @@
   const hasFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
   /* ------------------------------------------------------------------------
-   * 1. Hero Title Letter Reveal
-   * ------------------------------------------------------------------------ */
-  function initTitleReveal() {
-    const title = document.getElementById('hero-title');
-    if (!title) return;
-
-    let index = 0;
-    const wrapNode = (node, isAccent) => {
-      const fragment = document.createDocumentFragment();
-      const text = node.textContent.trim();
-      for (const ch of text) {
-        const span = document.createElement('span');
-        span.className = 'char' + (isAccent ? ' crimson-accent' : '');
-        span.style.setProperty('--i', index++);
-        span.setAttribute('aria-hidden', 'true');
-        span.textContent = ch;
-        fragment.appendChild(span);
-      }
-      return fragment;
-    };
-
-    const nodes = Array.from(title.childNodes);
-    title.textContent = '';
-    nodes.forEach((node) => {
-      if (!node.textContent.trim()) return;
-      const isAccent = node.nodeType === 1 && node.classList.contains('crimson-accent');
-      title.appendChild(wrapNode(node, isAccent));
-    });
-
-    if (prefersReducedMotion) {
-      title.classList.add('is-ready');
-      return;
-    }
-
-    // Double rAF guarantees initial hidden state is painted before transition triggers
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        title.classList.add('is-ready');
-      });
-    });
-  }
-
-  /* ------------------------------------------------------------------------
-   * 2. Scroll Reveal Animations (Intersection Observer + Viewport Sweep)
+   * 1. Below-the-Fold Scroll Reveal (Intersection Observer Only — No Reflow)
    * ------------------------------------------------------------------------ */
   function initScrollReveal() {
-    const fadeElements = Array.from(document.querySelectorAll('.fade-in'));
+    const fadeElements = document.querySelectorAll('.fade-in');
     if (!fadeElements.length) return;
-
-    const showElement = (el) => {
-      if (el.classList.contains('is-visible')) return;
-      const delay = parseInt(el.getAttribute('data-delay') || '0', 10);
-      const reveal = () => {
-        el.classList.add('is-visible');
-        el.addEventListener(
-          'transitionend',
-          () => {
-            el.style.willChange = 'auto';
-          },
-          { once: true }
-        );
-      };
-
-      if (delay > 0 && !prefersReducedMotion) {
-        setTimeout(reveal, Math.min(delay, 320));
-      } else {
-        reveal();
-      }
-    };
 
     if (prefersReducedMotion || !('IntersectionObserver' in window)) {
       fadeElements.forEach((el) => el.classList.add('is-visible'));
       return;
     }
 
-    // Immediately reveal elements already in or above the current viewport
-    const sweepVisible = () => {
-      const vh = window.innerHeight || document.documentElement.clientHeight;
-      fadeElements.forEach((el) => {
-        if (el.classList.contains('is-visible')) return;
-        const rect = el.getBoundingClientRect();
-        if (rect.top <= vh + 40) {
-          showElement(el);
-        }
-      });
-    };
-
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            showElement(entry.target);
+          if (entry.isIntersecting || entry.boundingClientRect.top < 0) {
+            const delay = parseInt(entry.target.getAttribute('data-delay') || '0', 10);
+            if (delay > 0) {
+              setTimeout(() => entry.target.classList.add('is-visible'), Math.min(delay, 240));
+            } else {
+              entry.target.classList.add('is-visible');
+            }
             observer.unobserve(entry.target);
           }
         });
@@ -109,18 +38,15 @@
       {
         root: null,
         threshold: 0.01,
-        rootMargin: '80px 0px 80px 0px',
+        rootMargin: '90px 0px 90px 0px',
       }
     );
 
     fadeElements.forEach((el) => observer.observe(el));
-    sweepVisible();
-    window.addEventListener('scroll', sweepVisible, { passive: true });
-    window.addEventListener('hashchange', sweepVisible, { passive: true });
   }
 
   /* ------------------------------------------------------------------------
-   * 3. Unified Pointer Tracking (Ambient Glow + Minimal Cursor Ring)
+   * 2. Unified Pointer Tracking (Ambient Glow + Minimal Cursor Ring)
    * ------------------------------------------------------------------------ */
   function initPointerEffects() {
     if (prefersReducedMotion || !hasFinePointer) return;
@@ -129,12 +55,12 @@
     const ring = document.getElementById('cursor-ring');
     if (!glow && !ring) return;
 
-    let targetX = window.innerWidth / 2;
-    let targetY = window.innerHeight / 2;
-    let glowX = targetX;
-    let glowY = targetY;
-    let ringX = targetX;
-    let ringY = targetY;
+    let targetX = 0;
+    let targetY = 0;
+    let glowX = 0;
+    let glowY = 0;
+    let ringX = 0;
+    let ringY = 0;
     let visible = false;
     let rafId = null;
 
@@ -144,8 +70,8 @@
       if (glow) {
         const dx = targetX - glowX;
         const dy = targetY - glowY;
-        glowX += dx * 0.11;
-        glowY += dy * 0.11;
+        glowX += dx * 0.12;
+        glowY += dy * 0.12;
         glow.style.transform = `translate3d(${glowX}px, ${glowY}px, 0)`;
         if (Math.abs(dx) > 0.25 || Math.abs(dy) > 0.25) needsNextFrame = true;
       }
@@ -204,7 +130,7 @@
   }
 
   /* ------------------------------------------------------------------------
-   * 4. Scroll Effects (Progress Bar, Header State, Orbital Parallax)
+   * 3. Scroll Effects (Deferred to Scroll Interaction — Zero Load Reflow)
    * ------------------------------------------------------------------------ */
   function initScrollEffects() {
     const bar = document.getElementById('scroll-progress');
@@ -215,16 +141,14 @@
     const update = () => {
       const y = window.scrollY;
       const max = document.documentElement.scrollHeight - window.innerHeight;
+      const ratio = max > 0 ? Math.min(1, Math.max(0, y / max)) : 0;
 
       if (bar) {
-        const ratio = max > 0 ? Math.min(1, Math.max(0, y / max)) : 0;
         bar.style.transform = `scaleX(${ratio})`;
       }
-
       if (header) {
         header.classList.toggle('is-scrolled', y > 36);
       }
-
       if (rings && !prefersReducedMotion) {
         rings.style.setProperty('--py', `${Math.min(y * 0.1, 140)}px`);
       }
@@ -242,13 +166,10 @@
       },
       { passive: true }
     );
-
-    window.addEventListener('resize', update, { passive: true });
-    update();
   }
 
   /* ------------------------------------------------------------------------
-   * 5. Live UTC Telemetry Clock
+   * 4. Live UTC Telemetry Clock
    * ------------------------------------------------------------------------ */
   function initUtcClock() {
     const clockEl = document.getElementById('utc-clock');
@@ -266,7 +187,7 @@
   }
 
   /* ------------------------------------------------------------------------
-   * 6. Back to Top Smooth Interaction
+   * 5. Back to Top Smooth Interaction
    * ------------------------------------------------------------------------ */
   function initBackToTop() {
     const backToTopBtn = document.getElementById('back-to-top');
@@ -282,7 +203,7 @@
   }
 
   /* ------------------------------------------------------------------------
-   * 7. Console Digital Signature
+   * 6. Console Digital Signature
    * ------------------------------------------------------------------------ */
   function printIdentitySignature() {
     const signature = `
@@ -294,8 +215,8 @@
       signature,
       'background: #E63946; color: #FFFFFF; font-weight: bold; padding: 4px 8px; border-radius: 2px; font-family: monospace;',
       'background: #0D0E12; color: #F0F0F0; padding: 4px 8px; font-family: monospace;',
-      'color: #858990; font-family: monospace; font-size: 11px;',
-      'color: #565B64; font-family: monospace; font-size: 10px;'
+      'color: #8A8F98; font-family: monospace; font-size: 11px;',
+      'color: #808590; font-family: monospace; font-size: 10px;'
     );
   }
 
@@ -303,7 +224,6 @@
    * Initialization
    * ------------------------------------------------------------------------ */
   document.addEventListener('DOMContentLoaded', () => {
-    initTitleReveal();
     initScrollReveal();
     initScrollEffects();
     initPointerEffects();

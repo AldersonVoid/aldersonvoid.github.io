@@ -3,17 +3,14 @@
    Theme: Deep Dark, Cinematic, Minimalist Luxury, Editorial Tech
    ========================================================================== */
 
-/* --------------------------------------------------------------------------
-   Design Tokens
-   -------------------------------------------------------------------------- */
 :root {
   --bg-primary: #08090B;
   --bg-secondary: #0D0E12;
   --bg-surface: rgba(18, 20, 26, 0.55);
 
   --text-primary: #F0F0F0;
-  --text-secondary: #858990;
-  --text-muted: #565B64;
+  --text-secondary: #8A8F98;
+  --text-muted: #808590;
 
   --accent-crimson: #E63946;
   --accent-crimson-dim: rgba(230, 57, 70, 0.15);
@@ -31,9 +28,6 @@
   --ease-cinematic: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* --------------------------------------------------------------------------
-   Reset & Base Setup
-   -------------------------------------------------------------------------- */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -66,9 +60,6 @@ body {
   color: #FFFFFF;
 }
 
-/* --------------------------------------------------------------------------
-   Accessibility & Focus States
-   -------------------------------------------------------------------------- */
 :focus-visible {
   outline: 2px solid var(--accent-crimson);
   outline-offset: 4px;
@@ -94,9 +85,7 @@ body {
   top: 1.25rem;
 }
 
-/* --------------------------------------------------------------------------
-   Atmospheric Background Layers
-   -------------------------------------------------------------------------- */
+/* Atmospheric Background Layers */
 .grid-backdrop {
   position: fixed;
   inset: 0;
@@ -117,7 +106,6 @@ body {
   border-radius: 50%;
   filter: blur(95px);
   opacity: 0.55;
-  will-change: transform;
 }
 
 .orb-a {
@@ -160,7 +148,6 @@ body {
   z-index: 2;
   opacity: 0;
   transition: opacity 0.45s ease;
-  will-change: transform;
 }
 
 .grain-overlay {
@@ -199,7 +186,6 @@ body {
   pointer-events: none;
   z-index: 1000;
   opacity: 0;
-  will-change: transform;
   transition: opacity 0.35s ease,
               width 0.35s var(--ease-cinematic),
               height 0.35s var(--ease-cinematic),
@@ -223,9 +209,7 @@ body {
   }
 }
 
-/* --------------------------------------------------------------------------
-   Editorial Side Rails (Only where generous gutter exists)
-   -------------------------------------------------------------------------- */
+/* Editorial Side Rails */
 .side-rail {
   position: fixed;
   top: 50%;
@@ -263,9 +247,7 @@ body {
   }
 }
 
-/* --------------------------------------------------------------------------
-   Layout Container
-   -------------------------------------------------------------------------- */
+/* Layout Container */
 .container {
   width: 100%;
   max-width: var(--container-max);
@@ -277,9 +259,7 @@ body {
   z-index: 10;
 }
 
-/* --------------------------------------------------------------------------
-   Site Header / Navigation
-   -------------------------------------------------------------------------- */
+/* Site Header / Navigation */
 .site-header {
   position: fixed;
   top: 0;
@@ -432,13 +412,12 @@ body {
 
 @media (max-width: 360px) {
   .monogram-text {
-    display: none;
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
   }
 }
 
-/* --------------------------------------------------------------------------
-   Hero Section
-   -------------------------------------------------------------------------- */
+/* Hero Section */
 .hero-section {
   min-height: 100vh;
   min-height: min(100svh, 1080px);
@@ -550,17 +529,7 @@ body {
   white-space: nowrap;
 }
 
-/* Applied directly per character span so background-clip renders identically across all browsers */
-.hero-title .char {
-  display: inline-block;
-  opacity: 0;
-  transform: translateY(0.28em);
-  transition: opacity 0.6s var(--ease-cinematic),
-              transform 0.6s var(--ease-cinematic);
-  transition-delay: calc(var(--i) * 26ms + 40ms);
-}
-
-.hero-title .char:not(.crimson-accent) {
+.hero-title-text {
   background: linear-gradient(180deg, #FFFFFF 0%, #F0F0F0 45%, #8D929C 115%);
   -webkit-background-clip: text;
           background-clip: text;
@@ -568,12 +537,7 @@ body {
   color: var(--text-primary);
 }
 
-.hero-title.is-ready .char {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.hero-title .crimson-accent {
+.crimson-accent {
   color: var(--accent-crimson);
   -webkit-text-fill-color: var(--accent-crimson);
 }
@@ -685,7 +649,6 @@ body {
   }
 }
 
-/* Short & landscape viewports (e.g., rotated phones, compact laptops) */
 @media (max-height: 540px) {
   .header-inner {
     padding-block: 0.55rem;
@@ -723,9 +686,7 @@ body {
   }
 }
 
-/* --------------------------------------------------------------------------
-   Section Dividers
-   -------------------------------------------------------------------------- */
+/* Section Dividers */
 .section-divider {
   max-width: var(--container-max);
   margin: 0 auto;
@@ -749,9 +710,7 @@ body {
   transform: rotate(45deg);
 }
 
-/* --------------------------------------------------------------------------
-   Editorial 2-Column Grid (About, Interests, Presence)
-   -------------------------------------------------------------------------- */
+/* Editorial 2-Column Grid */
 .editorial-grid {
   display: grid;
   grid-template-columns: 230px 1fr;
@@ -829,9 +788,7 @@ body {
   background: linear-gradient(90deg, var(--accent-crimson), transparent);
 }
 
-/* --------------------------------------------------------------------------
-   About Section
-   -------------------------------------------------------------------------- */
+/* About Section */
 .lead-prose p {
   font-size: clamp(1.08rem, 1.7vw, 1.45rem);
   font-weight: 300;
@@ -847,9 +804,7 @@ body {
   color: var(--text-primary);
 }
 
-/* --------------------------------------------------------------------------
-   Identity & Interests — Typographic Editorial List (No Cards, Zero CLS)
-   -------------------------------------------------------------------------- */
+/* Identity & Interests — Typographic List */
 .typographic-list {
   list-style: none;
   border-top: 1px solid var(--border-subtle);
@@ -911,11 +866,10 @@ body {
 .entry-subtext {
   font-family: var(--font-body);
   font-size: clamp(0.88rem, 1.2vw, 0.96rem);
-  color: var(--text-muted);
+  color: var(--text-secondary);
   font-weight: 300;
   line-height: 1.5;
-  opacity: 0.78;
-  transition: color 0.35s ease, opacity 0.35s ease;
+  transition: color 0.35s ease;
 }
 
 .entry-marker {
@@ -939,8 +893,7 @@ body {
     letter-spacing: -0.018em;
   }
   .list-entry:hover .entry-subtext {
-    color: var(--text-secondary);
-    opacity: 1;
+    color: var(--text-primary);
   }
   .list-entry:hover .entry-marker {
     background: var(--accent-crimson);
@@ -960,9 +913,7 @@ body {
   }
 }
 
-/* --------------------------------------------------------------------------
-   Presence Section (GitHub Link)
-   -------------------------------------------------------------------------- */
+/* Presence Section */
 .presence-container {
   max-width: 36rem;
   min-width: 0;
@@ -1097,9 +1048,7 @@ body {
   }
 }
 
-/* --------------------------------------------------------------------------
-   Site Footer
-   -------------------------------------------------------------------------- */
+/* Site Footer */
 .site-footer {
   border-top: 1px solid var(--border-subtle);
   padding: clamp(2.5rem, 6vh, 4rem) 0;
@@ -1154,7 +1103,7 @@ body {
   font-family: var(--font-heading);
   font-style: italic;
   font-size: 0.95rem;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
 .back-to-top {
@@ -1208,15 +1157,12 @@ body {
   }
 }
 
-/* --------------------------------------------------------------------------
-   Entrance & Keyframe Animations
-   -------------------------------------------------------------------------- */
+/* Below-the-Fold Scroll Reveal Animations */
 .fade-in {
   opacity: 0;
   transform: translateY(16px);
-  transition: opacity 0.72s var(--ease-cinematic),
-              transform 0.72s var(--ease-cinematic);
-  will-change: opacity, transform;
+  transition: opacity 0.7s var(--ease-cinematic),
+              transform 0.7s var(--ease-cinematic);
 }
 
 .fade-in.is-visible {
@@ -1268,9 +1214,6 @@ body {
   }
 }
 
-/* --------------------------------------------------------------------------
-   Reduced Motion Preferences
-   -------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -1280,11 +1223,9 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  .fade-in,
-  .hero-title .char {
+  .fade-in {
     opacity: 1 !important;
     transform: none !important;
-    filter: none !important;
   }
   .orb,
   .void-rings .ring-accent,
