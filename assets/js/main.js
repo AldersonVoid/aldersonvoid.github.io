@@ -6,93 +6,249 @@
 (function () {
   'use strict';
 
-  // Check reduced motion preference
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const hasFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
   /* ------------------------------------------------------------------------
-   * 1. Scroll Reveal Animations (Intersection Observer)
+   * 1. Hero Title Letter Reveal
+   * ------------------------------------------------------------------------ */
+  function initTitleReveal() {
+    const title = document.getElementById('hero-title');
+    if (!title) return;
+
+    let index = 0;
+    const wrapNode = (node, isAccent) => {
+      const fragment = document.createDocumentFragment();
+      const text = node.textContent.trim();
+      for (const ch of text) {
+        const span = document.createElement('span');
+        span.className = 'char' + (isAccent ? ' crimson-accent' : '');
+        span.style.setProperty('--i', index++);
+        span.setAttribute('aria-hidden', 'true');
+        span.textContent = ch;
+        fragment.appendChild(span);
+      }
+      return fragment;
+    };
+
+    const nodes = Array.from(title.childNodes);
+    title.textContent = '';
+    nodes.forEach((node) => {
+      if (!node.textContent.trim()) return;
+      const isAccent = node.nodeType === 1 && node.classList.contains('crimson-accent');
+      title.appendChild(wrapNode(node, isAccent));
+    });
+
+    if (prefersReducedMotion) {
+      title.classList.add('is-ready');
+      return;
+    }
+
+    // Double rAF guarantees initial hidden state is painted before transition triggers
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        title.classList.add('is-ready');
+      });
+    });
+  }
+
+  /* ------------------------------------------------------------------------
+   * 2. Scroll Reveal Animations (Intersection Observer + Viewport Sweep)
    * ------------------------------------------------------------------------ */
   function initScrollReveal() {
-    const fadeElements = document.querySelectorAll('.fade-in');
+    const fadeElements = Array.from(document.querySelectorAll('.fade-in'));
     if (!fadeElements.length) return;
+
+    const showElement = (el) => {
+      if (el.classList.contains('is-visible')) return;
+      const delay = parseInt(el.getAttribute('data-delay') || '0', 10);
+      const reveal = () => {
+        el.classList.add('is-visible');
+        el.addEventListener(
+          'transitionend',
+          () => {
+            el.style.willChange = 'auto';
+          },
+          { once: true }
+        );
+      };
+
+      if (delay > 0 && !prefersReducedMotion) {
+        setTimeout(reveal, Math.min(delay, 320));
+      } else {
+        reveal();
+      }
+    };
 
     if (prefersReducedMotion || !('IntersectionObserver' in window)) {
       fadeElements.forEach((el) => el.classList.add('is-visible'));
       return;
     }
 
+    // Immediately reveal elements already in or above the current viewport
+    const sweepVisible = () => {
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      fadeElements.forEach((el) => {
+        if (el.classList.contains('is-visible')) return;
+        const rect = el.getBoundingClientRect();
+        if (rect.top <= vh + 40) {
+          showElement(el);
+        }
+      });
+    };
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const delay = entry.target.getAttribute('data-delay') || 0;
-            if (delay > 0) {
-              setTimeout(() => {
-                entry.target.classList.add('is-visible');
-              }, parseInt(delay, 10));
-            } else {
-              entry.target.classList.add('is-visible');
-            }
+            showElement(entry.target);
             observer.unobserve(entry.target);
           }
         });
       },
       {
         root: null,
-        threshold: 0.1,
-        rootMargin: '0px 0px -40px 0px',
+        threshold: 0.01,
+        rootMargin: '80px 0px 80px 0px',
       }
     );
 
     fadeElements.forEach((el) => observer.observe(el));
+    sweepVisible();
+    window.addEventListener('scroll', sweepVisible, { passive: true });
+    window.addEventListener('hashchange', sweepVisible, { passive: true });
   }
 
   /* ------------------------------------------------------------------------
-   * 2. Subtle Ambient Mouse Tracking
+   * 3. Unified Pointer Tracking (Ambient Glow + Minimal Cursor Ring)
    * ------------------------------------------------------------------------ */
-  function initMouseGlow() {
-    if (prefersReducedMotion) return;
-    const glow = document.getElementById('mouse-glow');
-    if (!glow) return;
+  function initPointerEffects() {
+    if (prefersReducedMotion || !hasFinePointer) return;
 
-    // Check if device supports hover / fine pointer
-    if (window.matchMedia('(pointer: coarse)').matches) return;
+    const glow = document.getElementById('mouse-glow');
+    const ring = document.getElementById('cursor-ring');
+    if (!glow && !ring) return;
 
     let targetX = window.innerWidth / 2;
     let targetY = window.innerHeight / 2;
-    let currentX = targetX;
-    let currentY = targetY;
-    let hasMoved = false;
-    let animationFrameId = null;
+    let glowX = targetX;
+    let glowY = targetY;
+    let ringX = targetX;
+    let ringY = targetY;
+    let visible = false;
+    let rafId = null;
 
-    function onMouseMove(e) {
-      targetX = e.clientX;
-      targetY = e.clientY;
-      if (!hasMoved) {
-        hasMoved = true;
-        glow.style.opacity = '1';
+    function tick() {
+      let needsNextFrame = false;
+
+      if (glow) {
+        const dx = targetX - glowX;
+        const dy = targetY - glowY;
+        glowX += dx * 0.11;
+        glowY += dy * 0.11;
+        glow.style.transform = `translate3d(${glowX}px, ${glowY}px, 0)`;
+        if (Math.abs(dx) > 0.25 || Math.abs(dy) > 0.25) needsNextFrame = true;
+      }
+
+      if (ring) {
+        const dx = targetX - ringX;
+        const dy = targetY - ringY;
+        ringX += dx * 0.2;
+        ringY += dy * 0.2;
+        ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`;
+        if (Math.abs(dx) > 0.25 || Math.abs(dy) > 0.25) needsNextFrame = true;
+      }
+
+      if (needsNextFrame && visible) {
+        rafId = requestAnimationFrame(tick);
+      } else {
+        rafId = null;
       }
     }
 
-    function render() {
-      // Smooth interpolation (damping)
-      currentX += (targetX - currentX) * 0.12;
-      currentY += (targetY - currentY) * 0.12;
-      glow.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
-      animationFrameId = requestAnimationFrame(render);
-    }
-
-    window.addEventListener('mousemove', onMouseMove, { passive: true });
-    animationFrameId = requestAnimationFrame(render);
+    window.addEventListener(
+      'mousemove',
+      (e) => {
+        targetX = e.clientX;
+        targetY = e.clientY;
+        if (!visible) {
+          visible = true;
+          glowX = ringX = targetX;
+          glowY = ringY = targetY;
+          if (glow) glow.style.opacity = '1';
+          if (ring) ring.style.opacity = '1';
+        }
+        if (!rafId) {
+          rafId = requestAnimationFrame(tick);
+        }
+      },
+      { passive: true }
+    );
 
     document.addEventListener('mouseleave', () => {
-      glow.style.opacity = '0';
-      hasMoved = false;
+      visible = false;
+      if (glow) glow.style.opacity = '0';
+      if (ring) ring.style.opacity = '0';
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
     });
+
+    if (ring) {
+      const interactiveSelector = 'a, button, .list-entry';
+      document.addEventListener('mouseover', (e) => {
+        ring.classList.toggle('is-active', Boolean(e.target.closest(interactiveSelector)));
+      });
+    }
   }
 
   /* ------------------------------------------------------------------------
-   * 3. Live UTC Telemetry Clock
+   * 4. Scroll Effects (Progress Bar, Header State, Orbital Parallax)
+   * ------------------------------------------------------------------------ */
+  function initScrollEffects() {
+    const bar = document.getElementById('scroll-progress');
+    const header = document.querySelector('.site-header');
+    const rings = document.querySelector('.void-rings');
+    let ticking = false;
+
+    const update = () => {
+      const y = window.scrollY;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+
+      if (bar) {
+        const ratio = max > 0 ? Math.min(1, Math.max(0, y / max)) : 0;
+        bar.style.transform = `scaleX(${ratio})`;
+      }
+
+      if (header) {
+        header.classList.toggle('is-scrolled', y > 36);
+      }
+
+      if (rings && !prefersReducedMotion) {
+        rings.style.setProperty('--py', `${Math.min(y * 0.1, 140)}px`);
+      }
+
+      ticking = false;
+    };
+
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          requestAnimationFrame(update);
+          ticking = true;
+        }
+      },
+      { passive: true }
+    );
+
+    window.addEventListener('resize', update, { passive: true });
+    update();
+  }
+
+  /* ------------------------------------------------------------------------
+   * 5. Live UTC Telemetry Clock
    * ------------------------------------------------------------------------ */
   function initUtcClock() {
     const clockEl = document.getElementById('utc-clock');
@@ -110,7 +266,7 @@
   }
 
   /* ------------------------------------------------------------------------
-   * 4. Back to Top Smooth Interaction
+   * 6. Back to Top Smooth Interaction
    * ------------------------------------------------------------------------ */
   function initBackToTop() {
     const backToTopBtn = document.getElementById('back-to-top');
@@ -126,34 +282,7 @@
   }
 
   /* ------------------------------------------------------------------------
-   * 5. Header Border Dynamics on Scroll
-   * ------------------------------------------------------------------------ */
-  function initHeaderScrollState() {
-    const header = document.querySelector('.site-header');
-    if (!header) return;
-
-    let ticking = false;
-    window.addEventListener(
-      'scroll',
-      () => {
-        if (!ticking) {
-          window.requestAnimationFrame(() => {
-            if (window.scrollY > 40) {
-              header.style.borderBottomColor = 'rgba(255, 255, 255, 0.12)';
-            } else {
-              header.style.borderBottomColor = 'var(--border-subtle)';
-            }
-            ticking = false;
-          });
-          ticking = true;
-        }
-      },
-      { passive: true }
-    );
-  }
-
-  /* ------------------------------------------------------------------------
-   * 6. Console Digital Signature
+   * 7. Console Digital Signature
    * ------------------------------------------------------------------------ */
   function printIdentitySignature() {
     const signature = `
@@ -166,83 +295,8 @@
       'background: #E63946; color: #FFFFFF; font-weight: bold; padding: 4px 8px; border-radius: 2px; font-family: monospace;',
       'background: #0D0E12; color: #F0F0F0; padding: 4px 8px; font-family: monospace;',
       'color: #858990; font-family: monospace; font-size: 11px;',
-      'color: #52565E; font-family: monospace; font-size: 10px;'
+      'color: #565B64; font-family: monospace; font-size: 10px;'
     );
-  }
-
-  /* ------------------------------------------------------------------------
-   * 7. Hero title letter reveal
-   * ------------------------------------------------------------------------ */
-  function initTitleReveal() {
-    const title = document.getElementById('hero-title');
-    if (!title) return;
-    let i = 0;
-    const wrap = (node, accent) => {
-      const frag = document.createDocumentFragment();
-      for (const ch of node.textContent.trim()) {
-        const span = document.createElement('span');
-        span.className = 'char' + (accent ? ' crimson-accent' : '');
-        span.style.setProperty('--i', i++);
-        span.setAttribute('aria-hidden', 'true');
-        span.textContent = ch;
-        frag.appendChild(span);
-      }
-      return frag;
-    };
-    const nodes = Array.from(title.childNodes);
-    title.textContent = '';
-    nodes.forEach((n) => {
-      if (!n.textContent.trim()) return;
-      const accent = n.nodeType === 1 && n.classList.contains('crimson-accent');
-      title.appendChild(wrap(n, accent));
-    });
-    requestAnimationFrame(() => title.classList.add('is-ready'));
-  }
-
-  /* ------------------------------------------------------------------------
-   * 8. Scroll progress hairline + parallax rings
-   * ------------------------------------------------------------------------ */
-  function initScrollEffects() {
-    const bar = document.getElementById('scroll-progress');
-    const rings = document.querySelector('.void-rings');
-    let ticking = false;
-    const update = () => {
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      const y = window.scrollY;
-      if (bar) bar.style.transform = `scaleX(${max > 0 ? y / max : 0})`;
-      if (rings && !prefersReducedMotion) {
-        rings.style.setProperty('--py', `${y * 0.12}px`);
-      }
-      ticking = false;
-    };
-    window.addEventListener('scroll', () => {
-      if (!ticking) { requestAnimationFrame(update); ticking = true; }
-    }, { passive: true });
-    update();
-  }
-
-  /* ------------------------------------------------------------------------
-   * 9. Minimal cursor ring
-   * ------------------------------------------------------------------------ */
-  function initCursorRing() {
-    const ring = document.getElementById('cursor-ring');
-    if (!ring || prefersReducedMotion) return;
-    if (!window.matchMedia('(pointer: fine)').matches) return;
-    let tx = 0, ty = 0, x = 0, y = 0, shown = false;
-    window.addEventListener('mousemove', (e) => {
-      tx = e.clientX; ty = e.clientY;
-      if (!shown) { shown = true; ring.style.opacity = '1'; }
-    }, { passive: true });
-    document.addEventListener('mouseleave', () => { ring.style.opacity = '0'; shown = false; });
-    const hoverSel = 'a, button, .list-entry';
-    document.addEventListener('mouseover', (e) => {
-      ring.classList.toggle('is-active', !!e.target.closest(hoverSel));
-    });
-    (function loop() {
-      x += (tx - x) * 0.18; y += (ty - y) * 0.18;
-      ring.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-      requestAnimationFrame(loop);
-    })();
   }
 
   /* ------------------------------------------------------------------------
@@ -252,11 +306,9 @@
     initTitleReveal();
     initScrollReveal();
     initScrollEffects();
-    initCursorRing();
-    initMouseGlow();
+    initPointerEffects();
     initUtcClock();
     initBackToTop();
-    initHeaderScrollState();
     printIdentitySignature();
   });
 })();

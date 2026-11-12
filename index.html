@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>AldersonVoid — Beyond the Interface</title>
-  
+
   <!-- Primary Meta Tags -->
   <meta name="title" content="AldersonVoid — Beyond the Interface">
   <meta name="description" content="Somewhere between code and the unknown. An independent mind exploring technology, code, cybersecurity, and the endless possibilities of the digital world.">
@@ -35,7 +35,7 @@
   <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
   <link rel="alternate icon" href="assets/images/favicon.svg">
 
-  <!-- Google Fonts Preconnect -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -61,19 +61,18 @@
   <!-- Accessible Skip Link -->
   <a href="#main-content" class="skip-link">Skip to content</a>
 
-  <!-- Ambient Cinematic Background -->
-  <div class="ambient-vignette" aria-hidden="true"></div>
-  <div class="ambient-glow" aria-hidden="true"></div>
-  <div class="mouse-glow" id="mouse-glow" aria-hidden="true"></div>
+  <!-- Ambient Atmospheric Layers -->
   <div class="grid-backdrop" aria-hidden="true"></div>
   <div class="orb orb-a" aria-hidden="true"></div>
   <div class="orb orb-b" aria-hidden="true"></div>
+  <div class="ambient-vignette" aria-hidden="true"></div>
+  <div class="mouse-glow" id="mouse-glow" aria-hidden="true"></div>
   <div class="grain-overlay" aria-hidden="true"></div>
   <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
   <div class="cursor-ring" id="cursor-ring" aria-hidden="true"></div>
 
-  <!-- Side rails -->
-  <div class="side-rail rail-left" aria-hidden="true"><span>AV / 00</span></div>
+  <!-- Editorial Side Rails (Wide Viewports Only) -->
+  <div class="side-rail rail-left" aria-hidden="true"><span>AV // 00</span></div>
   <div class="side-rail rail-right" aria-hidden="true"><span>BEYOND THE INTERFACE</span></div>
 
   <!-- Minimal Persistent Navigation -->
@@ -86,12 +85,13 @@
       </a>
 
       <div class="header-meta" aria-hidden="true">
-        <span class="telemetry-label">SYSTEM</span>
-        <span class="telemetry-val">STABLE // UTC <span id="utc-clock">00:00</span></span>
+        <span class="telemetry-label">UTC</span>
+        <span class="telemetry-sep">//</span>
+        <span class="telemetry-val" id="utc-clock">00:00</span>
       </div>
 
       <nav class="header-nav" aria-label="Quick links">
-        <a href="https://github.com/AldersonVoid" target="_blank" rel="noopener noreferrer" class="nav-github-link">
+        <a href="https://github.com/AldersonVoid" target="_blank" rel="noopener noreferrer" class="nav-github-link" aria-label="GitHub profile AldersonVoid">
           <svg class="nav-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
             <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
           </svg>
@@ -104,20 +104,23 @@
 
   <!-- Main Content -->
   <main id="main-content">
-    
+
     <!-- Hero Section -->
     <section id="hero" class="hero-section" aria-label="Introduction">
+      <!-- Subtle Architectural Orbital Rings -->
       <svg class="void-rings" viewBox="0 0 800 800" aria-hidden="true" focusable="false">
+        <line x1="400" y1="20" x2="400" y2="780" class="ring-axis" />
+        <line x1="20" y1="400" x2="780" y2="400" class="ring-axis" />
         <circle cx="400" cy="400" r="120" />
-        <circle cx="400" cy="400" r="200" />
-        <circle cx="400" cy="400" r="280" />
-        <circle cx="400" cy="400" r="360" />
-        <circle class="ring-accent" cx="400" cy="400" r="200" pathLength="100" />
-        <circle class="ring-dot" cx="400" cy="40" r="3" />
+        <circle cx="400" cy="400" r="210" />
+        <circle cx="400" cy="400" r="300" />
+        <circle cx="400" cy="400" r="380" class="ring-dashed" />
+        <circle class="ring-accent" cx="400" cy="400" r="210" pathLength="100" />
+        <circle class="ring-dot" cx="400" cy="100" r="3" />
       </svg>
+
       <div class="container hero-container">
-        
-        <div class="hero-overline fade-in" data-delay="100">
+        <div class="hero-overline fade-in" data-delay="80">
           <span class="overline-mark" aria-hidden="true"></span>
           <span>DIGITAL IDENTITY / EST. IN THE UNKNOWN</span>
         </div>
@@ -126,21 +129,20 @@
           AldersonVoid<span class="crimson-accent">.</span>
         </h1>
 
-        <div class="hero-narrative fade-in" data-delay="300">
+        <div class="hero-narrative fade-in" data-delay="220">
           <p class="hero-tagline">“Somewhere between code and the unknown.”</p>
           <p class="hero-intro">
             An independent mind exploring technology, code, cybersecurity, and the endless possibilities of the digital world.
           </p>
         </div>
 
-        <div class="hero-footer-line fade-in" data-delay="400">
+        <div class="hero-footer-line fade-in" data-delay="320">
           <div class="creed-text">THINK DEEPLY. BUILD QUIETLY. EXPLORE LIMITLESSLY.</div>
-          <div class="hero-scroll-cue" aria-hidden="true">
-            <span class="scroll-track"><span class="scroll-thumb"></span></span>
+          <a href="#about" class="hero-scroll-cue" aria-label="Scroll to About section">
+            <span class="scroll-track" aria-hidden="true"><span class="scroll-thumb"></span></span>
             <span class="scroll-label">EXPLORE</span>
-          </div>
+          </a>
         </div>
-
       </div>
     </section>
 
@@ -154,10 +156,9 @@
     <!-- About Section -->
     <section id="about" class="about-section" aria-label="About AldersonVoid">
       <div class="container">
-        
         <div class="editorial-grid">
           <div class="grid-label fade-in">
-            <span class="section-index">01</span>
+            <span class="section-index" aria-hidden="true">01</span>
             <span class="section-caption">ORIGIN &amp; ESSENCE</span>
           </div>
 
@@ -166,14 +167,13 @@
               Beyond the Interface<span class="crimson-accent">.</span>
             </h2>
 
-            <div class="lead-prose fade-in">
+            <div class="lead-prose fade-in" data-delay="100">
               <p>
                 Not defined by a title, but by curiosity. AldersonVoid represents an ongoing journey through technology, programming, digital systems, and the art of understanding how things work beneath the surface.
               </p>
             </div>
           </div>
         </div>
-
       </div>
     </section>
 
@@ -184,25 +184,22 @@
       <div class="divider-line"></div>
     </div>
 
-    <!-- Identity & Interests Section (Minimal Typographic Presentation) -->
+    <!-- Identity & Interests Section (Pure Typographic Presentation) -->
     <section id="interests" class="interests-section" aria-label="Identity and Interests">
       <div class="container">
-        
         <div class="editorial-grid">
           <div class="grid-label fade-in">
-            <span class="section-index">02</span>
+            <span class="section-index" aria-hidden="true">02</span>
             <span class="section-caption">AREAS OF EXPLORATION</span>
           </div>
 
           <div class="grid-content">
             <h2 class="section-heading fade-in">
-              Curiosities &amp; Dispatches<span class="crimson-accent">.</span>
+              Identity &amp; Interests<span class="crimson-accent">.</span>
             </h2>
 
-            <!-- Typographic list instead of conventional cards -->
             <ul class="typographic-list" role="list">
-              
-              <li class="list-entry fade-in" data-delay="100">
+              <li class="list-entry fade-in" data-delay="60">
                 <span class="entry-index" aria-hidden="true">01</span>
                 <div class="entry-main">
                   <span class="entry-title">Programming</span>
@@ -211,7 +208,7 @@
                 <span class="entry-marker" aria-hidden="true"></span>
               </li>
 
-              <li class="list-entry fade-in" data-delay="150">
+              <li class="list-entry fade-in" data-delay="110">
                 <span class="entry-index" aria-hidden="true">02</span>
                 <div class="entry-main">
                   <span class="entry-title">Cybersecurity</span>
@@ -220,7 +217,7 @@
                 <span class="entry-marker" aria-hidden="true"></span>
               </li>
 
-              <li class="list-entry fade-in" data-delay="200">
+              <li class="list-entry fade-in" data-delay="160">
                 <span class="entry-index" aria-hidden="true">03</span>
                 <div class="entry-main">
                   <span class="entry-title">Open Source</span>
@@ -229,7 +226,7 @@
                 <span class="entry-marker" aria-hidden="true"></span>
               </li>
 
-              <li class="list-entry fade-in" data-delay="250">
+              <li class="list-entry fade-in" data-delay="210">
                 <span class="entry-index" aria-hidden="true">04</span>
                 <div class="entry-main">
                   <span class="entry-title">Linux &amp; Technology</span>
@@ -238,7 +235,7 @@
                 <span class="entry-marker" aria-hidden="true"></span>
               </li>
 
-              <li class="list-entry fade-in" data-delay="300">
+              <li class="list-entry fade-in" data-delay="260">
                 <span class="entry-index" aria-hidden="true">05</span>
                 <div class="entry-main">
                   <span class="entry-title">Digital Exploration</span>
@@ -246,11 +243,9 @@
                 </div>
                 <span class="entry-marker" aria-hidden="true"></span>
               </li>
-
             </ul>
           </div>
         </div>
-
       </div>
     </section>
 
@@ -264,10 +259,9 @@
     <!-- Social Presence Section -->
     <section id="presence" class="presence-section" aria-label="Social Presence">
       <div class="container">
-        
         <div class="editorial-grid">
           <div class="grid-label fade-in">
-            <span class="section-index">03</span>
+            <span class="section-index" aria-hidden="true">03</span>
             <span class="section-caption">CONNECTED NODE</span>
           </div>
 
@@ -277,14 +271,14 @@
             </h2>
 
             <div class="presence-container fade-in" data-delay="100">
-              <a href="https://github.com/AldersonVoid" 
-                 target="_blank" 
-                 rel="noopener noreferrer" 
-                 class="presence-link" 
+              <a href="https://github.com/AldersonVoid"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 class="presence-link"
                  aria-label="AldersonVoid on GitHub (opens in new tab)">
                 <div class="presence-content">
                   <div class="presence-icon-wrapper" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
                       <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
                     </svg>
                   </div>
@@ -301,7 +295,6 @@
             </div>
           </div>
         </div>
-
       </div>
     </section>
 
@@ -311,7 +304,6 @@
   <footer class="site-footer" role="contentinfo">
     <div class="footer-wordmark" aria-hidden="true">AldersonVoid</div>
     <div class="container footer-container">
-      
       <div class="footer-left">
         <span class="footer-copyright">AldersonVoid © 2026</span>
         <span class="footer-separator" aria-hidden="true">/</span>
@@ -319,12 +311,11 @@
       </div>
 
       <div class="footer-right">
-        <button id="back-to-top" class="back-to-top" aria-label="Back to top of page">
+        <button type="button" id="back-to-top" class="back-to-top" aria-label="Back to top of page">
           <span class="arrow-up" aria-hidden="true">↑</span>
           <span>RETURN TO TOP</span>
         </button>
       </div>
-
     </div>
   </footer>
 
